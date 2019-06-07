@@ -56,57 +56,55 @@ app.get('/cipher', (req, res) => {
 });
 
 app.get('/lotto', (req, res) => {
-    const numbers = req.query.arr;
-    // is valid
-    // must be an array of num
-    // must be exactly 6 num
-    // between 1-20
+    const temp = req.query.arr;
 
-    if (!numbers) {
+    if (!temp) {
         return res.status(400).send('Please provide a set of six numbers');
     }
 
-    if (!Array.isArray(numbers)) {
+    if (!Array.isArray(temp)) {
         return res.status(400).send('Please enter numbers as an Array');
     }
-    numbers.forEach(number => {
-        if (number < 1 || number > 20) {
-            return res.status(400).send('Please use numbers between 1 and 20');
-        }
-    })
-
 
     if (numbers.length !== 6) {
         return res.status(400).send('Please provide a set of six numbers');
     }
+
+    let numbers = temp.map(n => parseInt(n))
+
+    numbers.forEach(number => {
+        if (number < 1 || number > 20) {
+            return res.status(400).send('Please use numbers between 1 and 20');
+        }
+        if (isNaN(number)) {
+            return res.status(400).send('Please provide a set of six numbers');
+        }
+    })
+
 
     const winningNumbers = [];
     for (let i = 0; i < 6; i++) {
         winningNumbers.push(Math.ceil(Math.random() * 20));
     }
 
-    let results = winningNumbers.filter(n => numbers.includes(parseInt(n))).length
-    
-    let responseText=winningNumbers;
+    let results = winningNumbers.filter(n => numbers.includes(n)).length;
 
-    // switch (results) {
+    switch (results) {
+        case 4:
+            responseText = 'Congratulations, You win a free ticket!'
+            break;
+        case 5:
+            responseText = 'Congratulations, You win a $100.00!'
+            break;
+        case 6:
+            responseText = 'Congratulations, You could have won a real lottery!'
+            break;
+        default:
+            responseText = 'Sorry, you wasted you money!'
+    }
 
-    // case 4:
-    //     responseText = 'Congratulations, You win a free ticket!'
-    //     break;
-    // case 5:
-    //     responseText = 'Congratulations, You win a $100.00!'
-    //         break;
-    // case 6:
-    //     responseText = 'Congratulations, You could have won a real lottery!'
-    //         break;
-    // default:
-    //     responseText = 'Sorry, you wasted you money!'
-    // }
-
-    res.send(`winning numbers are: ${responseText} match count is:  ${results}Your numbers: ${numbers}`);
-
-    })
+    res.send(responseText);
+})
 
 
 
